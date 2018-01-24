@@ -95,51 +95,64 @@ class Inventory:
         new_item = Item(new_ref, desc, price_per_unit, quantity)
         self.items.append(new_item)
         self.__created.add(len(self.items) - 1)
-        # self.__refresh()
+        self.__refresh()
 
     def modify_item(self, ref, desc=None, price_per_unit=None, quantity=None):
         for index, item in enumerate(self.items):
             if item.ref == ref:
                 mod = index
-                break
-            if index == len(self.items) - 1:
-                raise Exception('Item does not exist.')
-
-        if desc is not None:
-            self.items[mod].desc = desc
-        if price_per_unit is not None:
-            self.items[mod].set_price_per_unit(price_per_unit)
-        if quantity is not None:
-            self.items[mod].set_quantity(quantity)
-        self.__changed.add(mod)
-        # self.__refresh()
+                if desc is not None:
+                    self.items[mod].desc = desc
+                if price_per_unit is not None:
+                    self.items[mod].set_price_per_unit(price_per_unit)
+                if quantity is not None:
+                    self.items[mod].set_quantity(quantity)
+                self.__changed.add(mod)
+                self.__refresh()
+                return 0
+        raise Exception('Item does not exist.')
 
     def delete_item(self, ref):  # CHANGE TO USE enumerate()
         for i in range(0, len(self.items) - 1):
             if self.items[i].ref == ref:
                 del_ref = self.items[i].ref
-                break
-            if i == len(self.items) - 1:
-                raise Exception('''Item does not exist''')
-        self.__deleted.add(del_ref)
-        # self.__refresh()
+                self.__deleted.add(del_ref)
+                self.__refresh()
+                return 0
+        raise Exception('''Item does not exist''')
 
-    '''
+    def clear(self):
+        '''
+        Remove all items from inventory.
+        '''
+        self.__deleted = {item.ref for item in self.items}
+        self.__refresh()
+
     def __save(self):
-        for each ref in self.__deleted:
-            find the item with the same ref in the database
-            delete it
-        for each index in self.__changed:
-            find item in database where item.ref == self.__items[index].ref
-            copy desc, price_per_unit,quantity,total_price from
-            self.__items[index] to item
-        for each index in self.__created:
-            self.__items[index] to new row in database
+        db = sqlite3.connect(self.__path)
+        for index in list(self.__changed):
+            item = self.items[index]
+            db.execute(
+                '''UPDATE inventory SET description = ?, price_per_unit = ?, quantity = ?
+                WHERE ref = ?''',
+                (item.desc, item.get_price_per_unit(), item.get_quantity(),
+                    item.ref))
+
+        for index in list(self.__created):
+            item = self.items[index]
+            new_row = (
+                item.ref, item.desc, item.get_price_per_unit(),
+                item.get_quantity())
+            db.execute('''INSERT into inventory values (?,?,?,?)''', new_row)
+
+        for ref in list(self.__deleted):
+            db.execute('''DELETE from inventory where ref = ?''', (ref, ))
+
+        db.commit()
 
     def __refresh(self):
         self.__save()
         self.__load()
-    '''
 
     def __load(self):
         self.__created = set()
