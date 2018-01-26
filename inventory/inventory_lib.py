@@ -112,11 +112,10 @@ class Inventory:
                 return 0
         raise Exception('Item does not exist.')
 
-    def delete_item(self, ref):  # CHANGE TO USE enumerate()
-        for i in range(0, len(self.items) - 1):
-            if self.items[i].ref == ref:
-                del_ref = self.items[i].ref
-                self.__deleted.add(del_ref)
+    def delete_item(self, ref):
+        for item in self.items:
+            if item.ref == ref:
+                self.__deleted.add(item.ref)
                 self.__refresh()
                 return 0
         raise Exception('''Item does not exist''')
