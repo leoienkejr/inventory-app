@@ -1,5 +1,6 @@
 ﻿*.sublime-project
 *.sublime-workspace
 *.db
+*.pyc
 _misc/
 _pycache_/
