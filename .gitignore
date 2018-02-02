@@ -2,3 +2,4 @@
 *.sublime-workspace
 *.db
 _misc/
+_pycache_/
