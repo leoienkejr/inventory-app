@@ -1,6 +1,6 @@
 '''
 
-inventory_lib.py
+core.py
 ~~~~~~~~~~~~~~~~
 
 This files contains classes used by inventory.py
