@@ -8,7 +8,7 @@ Inventory management command-line application.
 '''
 import os
 import appdirs
-import lib
+import core
 
 APPNAME = 'inventory-app'
 DB_FILENAME = 'inventory.db'

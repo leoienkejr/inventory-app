@@ -90,7 +90,7 @@ class Inventory:
                     return self.__gen_ref(length)
         return ref
 
-    def add_item(self, desc, price_per_unit=0, quantity=0):
+    def new_item(self, desc, price_per_unit=0, quantity=0):
         new_ref = self.__gen_ref(8)
         new_item = Item(new_ref, desc, price_per_unit, quantity)
         self.items.append(new_item)
