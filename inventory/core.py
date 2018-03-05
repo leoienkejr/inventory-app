@@ -3,7 +3,7 @@
 core.py
 ~~~~~~~~~~~~~~~~
 
-This files contains classes used by inventory.py
+inventory-app core logic
 
 '''
 
@@ -20,22 +20,21 @@ class Item:
         if len(str(desc)) == 0:
             raise Exception('''Description must not be blank.''')
 
+        if float(price_per_unit) < 0:
+            raise Exception('''Price per unit must not a negative number.''')
+        if int(quantity) < 0:
+            raise Exception('''Quantity must not be a negative number.''')
+
         try:
             self.__price_per_unit = float(price_per_unit)
         except ValueError:
             raise ValueError(
                 'Price per unit must be a positive real number.'
                 ' Example: 2.72, 5.4 or 7.')
-
         try:
-            self.__quantity = float(quantity)
+            self.__quantity = int(quantity)
         except ValueError:
             raise ValueError('''Quantity must be whole number. Example: 5''')
-
-        if price_per_unit < 0:
-            raise Exception('''Price per unit must not a negative number.''')
-        if quantity < 0:
-            raise Exception('''Quantity must not be a negative number.''')
 
         self.ref = ref
         self.desc = desc
@@ -90,9 +89,19 @@ class Inventory:
                     return self.__gen_ref(length)
         return ref
 
-    def new_item(self, desc, price_per_unit=0, quantity=0):
+    def new_item(self, desc, price_per_unit=None, quantity=None):
+        if price_per_unit is not None:
+            new_price = price_per_unit
+        else:
+            new_price = 0
+
+        if quantity is not None:
+            new_quantity = quantity
+        else:
+            new_quantity = 0
+
         new_ref = self.__gen_ref(8)
-        new_item = Item(new_ref, desc, price_per_unit, quantity)
+        new_item = Item(new_ref, desc, new_price, new_quantity)
         self.items.append(new_item)
         self.__created.add(len(self.items) - 1)
         self.__refresh()
